@@ -206,6 +206,50 @@
             51%, 100% { opacity: 0.3; }
         }
 
+        /* Animation สำหรับคิวใหม่ */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            40% {
+                transform: translateY(-15px) scale(1.05);
+            }
+            60% {
+                transform: translateY(-8px) scale(1.02);
+            }
+        }
+
+        @keyframes flash {
+            0%, 50%, 100% {
+                background: linear-gradient(135deg, #4299e1, #3182ce);
+                box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+            }
+            25%, 75% {
+                background: linear-gradient(135deg, #48bb78, #38a169);
+                box-shadow: 0 8px 25px rgba(72, 187, 120, 0.5);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .queue-display.new-update {
+            animation: bounce 0.8s ease-out, flash 1.5s ease-in-out;
+        }
+
+        .queue-number.new-update {
+            animation: shake 0.5s ease-in-out 0.3s;
+        }
+
+        .info-value.new-update {
+            animation: bounce 0.6s ease-out 0.2s;
+            color: #48bb78 !important;
+            transition: color 2s ease-out;
+        }
+
         /* Mobile optimizations */
         @media (max-width: 480px) {
             body {
@@ -331,7 +375,7 @@
             try {
                 // อ่าน parameter dept จาก URL
                 const urlParams = new URLSearchParams(window.location.search);
-                const selectedDept = urlParams.get('dept') || '2'; // default เป็น แถว 1
+                const selectedDept = urlParams.get('dept') || '1'; // default เป็น แถว 1
                 
                 console.log('Fetching data for department:', selectedDept);
                 
@@ -376,16 +420,108 @@
         function updateQueueDisplay(data) {
             if (!data) return;
             
+            // ตรวจสอบว่ามีการเปลี่ยนแปลงไหม
+            let hasChanges = false;
+            let changedElements = [];
+            
+            if (previousData) {
+                // ตรวจสอบการเปลี่ยนแปลงของคิวปัจจุบัน
+                if (previousData.currentQueue !== data.currentQueue) {
+                    hasChanges = true;
+                    changedElements.push('currentQueue');
+                    console.log('🔥 คิวใหม่!', previousData.currentQueue, '→', data.currentQueue);
+                }
+                
+                // ตรวจสอบการเปลี่ยนแปลงของคิวถัดไป
+                if (previousData.nextQueue !== data.nextQueue) {
+                    hasChanges = true;
+                    changedElements.push('nextQueue');
+                }
+                
+                // ตรวจสอบการเปลี่ยนแปลงของคิวรออยู่
+                if (previousData.waitingQueue !== data.waitingQueue) {
+                    hasChanges = true;
+                    changedElements.push('waitingQueue');
+                }
+            }
+            
             // อัพเดทชื่อแผนกในหัวข้อ
             const hospitalName = document.querySelector('.hospital-name');
             if (hospitalName) {
                 hospitalName.textContent = `🏥 โรงพยาบาล ABC - ${data.department}`;
             }
             
+            // อัพเดทข้อมูล
             document.getElementById('currentQueue').textContent = data.currentQueue;
             document.getElementById('nextQueue').textContent = data.nextQueue;
             document.getElementById('waitingQueue').textContent = data.waitingQueue;
             document.getElementById('lastUpdate').textContent = data.lastUpdate;
+            
+            // เพิ่มเอฟเฟกต์เด้งๆ ถ้ามีการเปลี่ยนแปลง
+            if (hasChanges && previousData) {
+                console.log('🎉 มีการเปลี่ยนแปลง! เล่นอนิเมชัน');
+                
+                // เอฟเฟกต์สำหรับ queue display
+                const queueDisplay = document.querySelector('.queue-display');
+                const queueNumber = document.querySelector('.queue-number');
+                
+                // ลบ class เก่า
+                queueDisplay.classList.remove('new-update');
+                queueNumber.classList.remove('new-update');
+                
+                // เพิ่ม class ใหม่หลังจาก delay เล็กน้อย
+                setTimeout(() => {
+                    queueDisplay.classList.add('new-update');
+                    queueNumber.classList.add('new-update');
+                }, 50);
+                
+                // เอฟเฟกต์สำหรับข้อมูลที่เปลี่ยน
+                changedElements.forEach((elementId, index) => {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.classList.remove('new-update');
+                        setTimeout(() => {
+                            element.classList.add('new-update');
+                        }, 100 + (index * 100));
+                        
+                        // ลบ class หลังจากอนิเมชันเสร็จ
+                        setTimeout(() => {
+                            element.classList.remove('new-update');
+                        }, 2000 + (index * 100));
+                    }
+                });
+                
+                // ลบ class หลังจากอนิเมชันเสร็จ
+                setTimeout(() => {
+                    queueDisplay.classList.remove('new-update');
+                    queueNumber.classList.remove('new-update');
+                }, 2300);
+                
+                // เล่นเสียงแจ้งเตือน (ถ้าต้องการ)
+                try {
+                    // สร้างเสียง beep ง่ายๆ
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.1);
+                } catch (e) {
+                    console.log('ไม่สามารถเล่นเสียงได้:', e);
+                }
+            }
+            
+            // เก็บข้อมูลปัจจุบันสำหรับการเปรียบเทียบครั้งต่อไป
+            previousData = { ...data };
         }
 
         // ฟังก์ชันเริ่มต้นและรีเฟรชข้อมูล

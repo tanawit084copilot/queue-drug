@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบแสดงคิวยา</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 15px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            margin: 0 auto;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .hospital-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .queue-display {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .queue-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .queue-label {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .queue-number {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 8px 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            line-height: 1;
+        }
+
+        .queue-status {
+            font-size: 1rem;
+            margin-top: 8px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .queue-info-row {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .queue-info-inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .divider {
+            width: 1px;
+            height: 40px;
+            background: #cbd5e0;
+            margin: 0 10px;
+        }
+
+        .update-section {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #b2f5ea;
+            text-align: center;
+        }
+
+        .update-time {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .update-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .refresh-info {
+            background: #f0f4f8;
+            color: #2d3748;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            border: 1px solid #cbd5e0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: blink 2s infinite;
+        }
+
+        .footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            color: #718096;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.05); opacity: 0.2; }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px 15px;
+                border-radius: 15px;
+            }
+
+            .hospital-name {
+                font-size: 1.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .queue-number {
+                font-size: 3rem;
+            }
+
+            .queue-label {
+                font-size: 1.1rem;
+            }
+
+            .queue-status {
+                font-size: 0.9rem;
+            }
+
+            .queue-info-inline {
+                gap: 10px;
+            }
+
+            .info-value {
+                font-size: 1.2rem;
+            }
+
+            .info-label {
+                font-size: 0.8rem;
+            }
+
+            .divider {
+                height: 35px;
+            }
+
+            .footer {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .queue-info-inline {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .divider {
+                display: none;
+            }
+
+            .info-item {
+                padding: 10px;
+                background: white;
+                border-radius: 8px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="hospital-name">🏥 โรงพยาบาล ABC</h1>
+            <p class="subtitle">ระบบแสดงคิวจ่ายยา</p>
+        </div>
+
+        <div class="queue-display">
+            <div class="queue-label">คิวปัจจุบัน</div>
+            <div class="queue-number" id="currentQueue">A018</div>
+            <div class="queue-status">
+                <span class="status-indicator"></span>
+                กำลังให้บริการ
+            </div>
+        </div>
+
+        <div class="queue-info-row">
+            <div class="queue-info-inline">
+                <div class="info-item">
+                    <div class="info-label">คิวถัดไป</div>
+                    <div class="info-value" id="nextQueue">A019</div>
+                </div>
+                <div class="divider"></div>
+                <div class="info-item">
+                    <div class="info-label">คิวรออยู่</div>
+                    <div class="info-value" id="waitingQueue">11</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="update-section">
+            <div class="update-time" id="lastUpdate">18:01</div>
+            <div class="update-label">อัพเดทล่าสุด</div>
+        </div>
+
+        <div class="refresh-info">
+            📱 ข้อมูลจะอัพเดทอัตโนมัติทุก 30 วินาที<br>
+            🔄 กรณีข้อมูลไม่อัพเดท กรุณารีเฟรชหน้าเว็บ
+        </div>
+
+        <div class="footer">
+            <p>📞 สอบถามข้อมูลเพิ่มเติม: โทร 02-XXX-XXXX</p>
+            <p>🕒 เวลาทำการ: 08:00 - 16:00 น.</p>
+        </div>
+    </div>
+
+    <script>
+        // ฟังก์ชันจำลองการดึงข้อมูลจาก Google Sheets
+        async function fetchQueueData() {
+            try {
+                // ใส่ URL ของ Google Sheets API หรือ CSV export ที่นี่
+                // const response = await fetch('YOUR_GOOGLE_SHEETS_URL');
+                // const data = await response.json();
+                
+                // ข้อมูลจำลองสำหรับการทดสอบ
+                const mockData = {
+                    currentQueue: 'A' + String(Math.floor(Math.random() * 100) + 1).padStart(3, '0'),
+                    nextQueue: 'A' + String(Math.floor(Math.random() * 100) + 2).padStart(3, '0'),
+                    waitingQueue: Math.floor(Math.random() * 20) + 5,
+                    lastUpdate: new Date().toLocaleTimeString('th-TH', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    })
+                };
+                
+                return mockData;
+            } catch (error) {
+                console.error('Error fetching queue data:', error);
+                return null;
+            }
+        }
+
+        // ฟังก์ชันอัพเดทข้อมูลบนหน้าเว็บ
+        function updateQueueDisplay(data) {
+            if (!data) return;
+            
+            document.getElementById('currentQueue').textContent = data.currentQueue;
+            document.getElementById('nextQueue').textContent = data.nextQueue;
+            document.getElementById('waitingQueue').textContent = data.waitingQueue;
+            document.getElementById('lastUpdate').textContent = data.lastUpdate;
+        }
+
+        // ฟังก์ชันเริ่มต้นและรีเฟรชข้อมูล
+        async function initializeQueue() {
+            const data = await fetchQueueData();
+            updateQueueDisplay(data);
+        }
+
+        // รีเฟรชข้อมูลทุก 30 วินาที
+        setInterval(initializeQueue, 30000);
+
+        // โหลดข้อมูลครั้งแรก
+        initializeQueue();
+
+        // เพิ่มการแสดงสถานะการโหลด
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ระบบแสดงคิวยาเริ่มทำงาน');
+        });
+    </script>
+</body>
+</html>

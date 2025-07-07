@@ -33,8 +33,8 @@ exports.handler = async (event, context) => {
     console.log('Parsed data:', data);
     
     // คำนวณ index แถวที่ต้องการ
-    // dept=4 -> แถวที่ 5 (index 4) - A0011
-    // dept=5 -> แถวที่ 6 (index 5) - A002
+    // dept=4 -> หาแถวที่คอลัมน์ A = 4 -> แถวที่ 5 (index 4) - A0011
+    // dept=5 -> หาแถวที่คอลัมน์ A = 5 -> แถวที่ 6 (index 5) - A002
     const rowIndex = parseInt(dept) + 1;
     
     console.log('Target row index:', rowIndex, 'for dept:', dept);

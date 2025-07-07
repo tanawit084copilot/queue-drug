@@ -370,6 +370,9 @@
     </div>
 
     <script>
+        // เก็บข้อมูลเก่าเพื่อเปรียบเทียบ (ประกาศที่ scope หลัก)
+        let previousData = null;
+
         // ฟังก์ชันดึงข้อมูลจาก Netlify Function
         async function fetchQueueData() {
             try {

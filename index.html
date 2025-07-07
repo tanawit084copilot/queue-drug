@@ -187,6 +187,15 @@
             line-height: 1.4;
         }
 
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.1; }
             50% { transform: scale(1.05); opacity: 0.2; }
@@ -308,6 +317,8 @@
             🔄 กรณีข้อมูลไม่อัพเดท กรุณารีเฟรชหน้าเว็บ
         </div>
 
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
         <div class="footer">
             <p>📞 สอบถามข้อมูลเพิ่มเติม: โทร 02-XXX-XXXX</p>
             <p>🕒 เวลาทำการ: 08:00 - 16:00 น.</p>
@@ -315,34 +326,61 @@
     </div>
 
     <script>
-        // ฟังก์ชันจำลองการดึงข้อมูลจาก Google Sheets
+        // ฟังก์ชันดึงข้อมูลจาก Netlify Function
         async function fetchQueueData() {
             try {
-                // ใส่ URL ของ Google Sheets API หรือ CSV export ที่นี่
-                // const response = await fetch('YOUR_GOOGLE_SHEETS_URL');
-                // const data = await response.json();
+                // อ่าน parameter dept จาก URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const selectedDept = urlParams.get('dept') || '1'; // default เป็น แถว 1
                 
-                // ข้อมูลจำลองสำหรับการทดสอบ
-                const mockData = {
-                    currentQueue: 'A' + String(Math.floor(Math.random() * 100) + 1).padStart(3, '0'),
-                    nextQueue: 'A' + String(Math.floor(Math.random() * 100) + 2).padStart(3, '0'),
-                    waitingQueue: Math.floor(Math.random() * 20) + 5,
-                    lastUpdate: new Date().toLocaleTimeString('th-TH', { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                    })
-                };
+                console.log('Fetching data for department:', selectedDept);
                 
-                return mockData;
+                // เรียก Netlify Function แทนการเรียก Google Sheets โดยตรง
+                const response = await fetch('/.netlify/functions/get-queue-data?dept=' + selectedDept);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const queueData = await response.json();
+                console.log('Queue data from function:', queueData);
+                
+                // ซ่อน error message ถ้ามี
+                document.getElementById('errorMessage').style.display = 'none';
+                
+                return queueData;
+                
             } catch (error) {
                 console.error('Error fetching queue data:', error);
-                return null;
+                
+                // แสดง error message
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+                errorDiv.style.display = 'block';
+                
+                // ข้อมูล fallback ในกรณี error
+                const urlParams = new URLSearchParams(window.location.search);
+                const selectedDept = urlParams.get('dept') || '1';
+                
+                return {
+                    department: `แผนก ${selectedDept}`,
+                    currentQueue: 'A001',
+                    nextQueue: 'A002',
+                    waitingQueue: 0,
+                    lastUpdate: 'ไม่สามารถเชื่อมต่อได้'
+                };
             }
         }
 
         // ฟังก์ชันอัพเดทข้อมูลบนหน้าเว็บ
         function updateQueueDisplay(data) {
             if (!data) return;
+            
+            // อัพเดทชื่อแผนกในหัวข้อ
+            const hospitalName = document.querySelector('.hospital-name');
+            if (hospitalName) {
+                hospitalName.textContent = `🏥 โรงพยาบาล ABC - ${data.department}`;
+            }
             
             document.getElementById('currentQueue').textContent = data.currentQueue;
             document.getElementById('nextQueue').textContent = data.nextQueue;

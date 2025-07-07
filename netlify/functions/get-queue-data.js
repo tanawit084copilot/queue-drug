@@ -32,10 +32,11 @@ exports.handler = async (event, context) => {
     
     console.log('Parsed data:', data);
     
-    // คำนวณ index แถวที่ต้องการ (dept + 3 เพราะ header + แถวว่าง)
+    // คำนวณ index แถวที่ต้องการ
     // dept=1 -> แถวที่ 4 (index 3)
-    // dept=2 -> แถวที่ 5 (index 4)
-    const rowIndex = parseInt(dept) + 3;
+    // dept=2 -> แถวที่ 5 (index 4) 
+    // dept=4 -> แถวที่ 7 (index 6)
+    const rowIndex = parseInt(dept) + 2;
     
     console.log('Target row index:', rowIndex, 'for dept:', dept);
     

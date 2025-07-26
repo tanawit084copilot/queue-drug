@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
       currentQueue: deptData[1] || 'A001',            // คอลัมน์ B - คิวล่าสุด
       nextQueue: deptData[2] || 'A002',               // คอลัมน์ C - คิวถัดไป
       waitingQueue: parseInt(deptData[3]) || 0,       // คอลัมน์ D - คิวรออยู่
-      hospitalName: parseInt(deptData[5]) || `โรงพยาบาลทดสอบxx`,       // คอลัมน์ F - โรงพยาบาลทดสอบ
+      hospitalName: deptData[5] || `โรงพยาบาลทดสอบxx`,       // คอลัมน์ F - โรงพยาบาลทดสอบ
       lastUpdate: deptData[4] || new Date().toLocaleTimeString('th-TH', { 
         hour: '2-digit', 
         minute: '2-digit' 

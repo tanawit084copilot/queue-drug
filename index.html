@@ -451,7 +451,8 @@
             // อัพเดทชื่อแผนกในหัวข้อ
             const hospitalName = document.querySelector('.hospital-name');
             if (hospitalName) {
-                hospitalName.textContent = `🏥 โรงพยาบาลพิมาย - ${data.department}`;
+                //hospitalName.textContent = `🏥 โรงพยาบาลทดสอบ - ${data.department}`;
+                hospitalName.textContent = `🏥 ${data.hospitalName}`;
             }
             
             // อัพเดทข้อมูล

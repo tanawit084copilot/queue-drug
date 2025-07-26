@@ -324,7 +324,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="hospital-name">🏥 โรงพยาบาล พิมาย</h1>
+            <h1 class="hospital-name">🏥 โรงพยาบาลทดสอบ</h1>
             <p class="subtitle">ระบบแสดงคิวจ่ายยา</p>
         </div>
 
@@ -454,6 +454,12 @@
                 //hospitalName.textContent = `🏥 โรงพยาบาลทดสอบ - ${data.department}`;
                 hospitalName.textContent = `🏥 ${data.hospitalName}`;
             }
+
+            const subtitleName = document.querySelector('.subtitle');
+            if (subtitleName) {
+                subtitleName.textContent = `${data.builName}`;
+            }
+            
             
             // อัพเดทข้อมูล
             document.getElementById('currentQueue').textContent = data.currentQueue;

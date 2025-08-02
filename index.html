@@ -396,6 +396,11 @@
             <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
         </div>
 
+<!--         <div class="demo-controls">
+            <button class="demo-btn" id="enableAudioBtn" onclick="enableAudio()">🔊 เปิดเสียง</button>
+            <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
+        </div> -->
+
         <div class="refresh-info">
             📱 ข้อมูลจะอัพเดทอัตโนมัติทุก 30 วินาที<br>
             🔄 กรณีข้อมูลไม่อัพเดท กรุณารีเฟรชหน้าเว็บ
@@ -414,6 +419,26 @@
         let previousData = null;
         let audioContext = null;
         let isAudioEnabled = false;
+
+        // function enableAudio() {
+        //     if (!audioContext) {
+        //         try {
+        //             audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        //             isAudioEnabled = true;
+        //             console.log('🔊 เปิดใช้งานเสียงแล้ว');
+        //             alert('✅ เปิดเสียงแจ้งเตือนแล้ว!');
+                    
+        //             // ซ่อนปุ่มเปิดเสียง
+        //             const enableAudioBtn = document.getElementById('enableAudioBtn');
+        //             if (enableAudioBtn) {
+        //                 enableAudioBtn.style.display = 'none';
+        //             }
+        //         } catch (e) {
+        //             console.error('ไม่สามารถเปิดใช้งานเสียงได้:', e);
+        //             alert('❌ ไม่สามารถเปิดเสียงได้');
+        //         }
+        //     }
+        // }
 
         // ฟังก์ชันเปิด/ปิดเสียง (Toggle)
         function toggleAudio() {

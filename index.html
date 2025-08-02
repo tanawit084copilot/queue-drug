@@ -392,7 +392,7 @@
         </div>
 
         <div class="demo-controls">
-            <button class="demo-btn" id="enableAudioBtn" onclick="enableAudio()">🔊 เปิดเสียง</button>
+            <button class="demo-btn" id="toggleAudioBtn" onclick="toggleAudio()">🔊 เปิดเสียง</button>
             <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
         </div>
 
@@ -415,25 +415,88 @@
         let audioContext = null;
         let isAudioEnabled = false;
 
-                // ฟังก์ชันเปิดใช้งานเสียง
-        function enableAudio() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    isAudioEnabled = true;
-                    console.log('🔊 เปิดใช้งานเสียงแล้ว');
-                    alert('✅ เปิดเสียงแจ้งเตือนแล้ว!');
-                    
-                    // ซ่อนปุ่มเปิดเสียง
-                    const enableAudioBtn = document.getElementById('enableAudioBtn');
-                    if (enableAudioBtn) {
-                        enableAudioBtn.style.display = 'none';
+        // ฟังก์ชันเปิด/ปิดเสียง (Toggle)
+        function toggleAudio() {
+            const toggleBtn = document.getElementById('toggleAudioBtn');
+            
+            if (!isAudioEnabled) {
+                // เปิดเสียง
+                if (!audioContext) {
+                    try {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        isAudioEnabled = true;
+                        console.log('🔊 เปิดเสียงแล้ว');
+                        
+                        // เปลี่ยนปุ่มเป็น "ปิดเสียง"
+                        toggleBtn.innerHTML = '🔇 ปิดเสียง';
+                        toggleBtn.style.background = '#e53e3e'; // สีแดง
+                        
+                        // แสดงการแจ้งเตือน
+                        showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
+                        
+                    } catch (e) {
+                        console.error('ไม่สามารถเปิดเสียงได้:', e);
+                        showNotification('❌ ไม่สามารถเปิดเสียงได้');
                     }
-                } catch (e) {
-                    console.error('ไม่สามารถเปิดใช้งานเสียงได้:', e);
-                    alert('❌ ไม่สามารถเปิดเสียงได้');
                 }
+            } else {
+                // ปิดเสียง
+                isAudioEnabled = false;
+                console.log('🔇 ปิดเสียงแล้ว');
+                
+                // เปลี่ยนปุ่มเป็น "เปิดเสียง"
+                toggleBtn.innerHTML = '🔊 เปิดเสียง';
+                toggleBtn.style.background = '#4299e1'; // สีน้ำเงิน
+                
+                // แสดงการแจ้งเตือน
+                showNotification('🔇 ปิดเสียงแจ้งเตือนแล้ว');
             }
+        }
+
+        // ฟังก์ชันแสดงการแจ้งเตือนแบบสั้นๆ
+        function showNotification(message) {
+            // สร้าง element แจ้งเตือน
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                z-index: 9999;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            
+            // เพิ่ม CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // แสดงการแจ้งเตือน
+            document.body.appendChild(notification);
+            
+            // ลบการแจ้งเตือนหลัง 3 วินาที
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
         // ฟังก์ชันเล่นเสียงแจ้งเตือน - BEEP BEEP ดัง 3 ชุด

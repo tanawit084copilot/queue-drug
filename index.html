@@ -325,6 +325,34 @@
                 width: 100%;
             }
         }
+
+        .demo-controls {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #ffeaa7;
+            text-align: center;
+        }
+
+        .demo-btn {
+            margin: 5px;
+            padding: 8px 16px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .demo-btn:hover {
+            background: #3182ce;
+        }
+
+
+        
     </style>
 </head>
 <body>
@@ -363,6 +391,11 @@
             </div>
         </div>
 
+        <div class="demo-controls">
+            <button class="demo-btn" onclick="enableAudio()">🔊 เปิดเสียง</button>
+            <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
+        </div>
+
         <div class="refresh-info">
             📱 ข้อมูลจะอัพเดทอัตโนมัติทุก 30 วินาที<br>
             🔄 กรณีข้อมูลไม่อัพเดท กรุณารีเฟรชหน้าเว็บ
@@ -379,6 +412,83 @@
     <script>
         // เก็บข้อมูลเก่าเพื่อเปรียบเทียบ (ประกาศที่ scope หลัก)
         let previousData = null;
+        let audioContext = null;
+        let isAudioEnabled = false;
+
+                // ฟังก์ชันเปิดใช้งานเสียง
+        function enableAudio() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    isAudioEnabled = true;
+                    console.log('🔊 เปิดใช้งานเสียงแล้ว');
+                    alert('✅ เปิดเสียงแจ้งเตือนแล้ว!');
+                    
+                    // ซ่อนปุ่มเปิดเสียง
+                    const enableAudioBtn = document.getElementById('enableAudioBtn');
+                    if (enableAudioBtn) {
+                        enableAudioBtn.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error('ไม่สามารถเปิดใช้งานเสียงได้:', e);
+                    alert('❌ ไม่สามารถเปิดเสียงได้');
+                }
+            }
+        }
+
+        // ฟังก์ชันเล่นเสียงแจ้งเตือน - BEEP BEEP ดัง 3 ชุด
+        function playNotificationSound() {
+            if (!isAudioEnabled || !audioContext) {
+                console.log('🔇 เสียงยังไม่เปิดใช้งาน');
+                return;
+            }
+
+            try {
+                // Resume audio context ถ้าถูก suspend
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                // เล่นเสียง BEEP BEEP 3 ชุด
+                const beepTimes = [
+                    // ชุดที่ 1: BEEP BEEP
+                    0, 0.15,
+                    // ชุดที่ 2: BEEP BEEP 
+                    0.6, 0.75,
+                    // ชุดที่ 3: BEEP BEEP
+                    1.2, 1.35
+                ];
+
+                beepTimes.forEach((startTime, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // ความถี่สูงกว่าเดิม เพื่อให้เสียงดังและชัดเจน
+                    oscillator.frequency.value = 1000;
+                    oscillator.type = 'square'; // เปลี่ยนเป็น square wave เพื่อเสียงที่ชัดเจนกว่า
+                    
+                    // เสียงดังขึ้น
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime + startTime);
+                    gainNode.gain.setValueAtTime(0.5, audioContext.currentTime + startTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + 0.12);
+                    
+                    oscillator.start(audioContext.currentTime + startTime);
+                    oscillator.stop(audioContext.currentTime + startTime + 0.12);
+                });
+                
+                console.log('🔊 เล่นเสียง BEEP BEEP ดัง 3 ชุดแล้ว');
+            } catch (e) {
+                console.error('ไม่สามารถเล่นเสียงได้:', e);
+            }
+        }
+
+        // ฟังก์ชันทดสอบเอฟเฟกต์
+        function testAnimation() {
+            playNotificationSound();
+        }
 
         // ฟังก์ชันดึงข้อมูลจาก Netlify Function
         async function fetchQueueData() {
@@ -529,27 +639,8 @@
                     queueNumber.classList.remove('new-update');
                 }, 2300);
                 
-                // เล่นเสียงแจ้งเตือน (ถ้าต้องการ)
-                try {
-                    // สร้างเสียง beep ง่ายๆ
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
-                    const gainNode = audioContext.createGain();
-                    
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-                    
-                    oscillator.frequency.value = 800;
-                    oscillator.type = 'sine';
-                    
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                    
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.1);
-                } catch (e) {
-                    console.log('ไม่สามารถเล่นเสียงได้:', e);
-                }
+                // เล่นเสียงแจ้งเตือน (เฉพาะเมื่อมี user interaction)
+                playNotificationSound();
             }
             
             // เก็บข้อมูลปัจจุบันสำหรับการเปรียบเทียบครั้งต่อไป
@@ -571,6 +662,10 @@
         // เพิ่มการแสดงสถานะการโหลด
         document.addEventListener('DOMContentLoaded', function() {
             console.log('ระบบแสดงคิวยาเริ่มทำงาน');
+            // Auto-enable audio บนเดสก์ท็อป
+            if (!(/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))) {
+                setTimeout(enableAudio, 1000);
+            }
         });
     </script>
 </body>

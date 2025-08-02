@@ -350,9 +350,9 @@
                     <div class="info-value" id="waitingQueue">11</div>
                 </div>
                 <div class="divider"></div>
-                <div class="info-item">        
-                    <div class="info-value" id="lastUpdate">18:01</div>
+                <div class="info-item">                   
                     <div class="info-label">อัพเดทล่าสุด</div>
+                    <div class="info-value" id="lastUpdate">18:01</div>
                 </div>                
             </div>
         </div>
@@ -420,6 +420,21 @@
             }
         }
 
+
+        // แปลงรูปแบบ queue จาก [B112][B113][B114] เป็น B112, B113, B114
+        function formatQueue(queueString) {
+            // ใช้ regular expression เพื่อหา pattern [Bxxx]
+            const matches = queueString.match(/\[([^\]]+)\]/g);
+            
+            if (matches) {
+                // แปลง [Bxxx] เป็น Bxxx และเชื่อมด้วย ", "
+                return matches.map(match => match.replace(/\[|\]/g, '')).join(', ');
+            }
+            
+            return queueString; // ถ้าไม่มี pattern ให้คืนค่าเดิม
+        }
+        
+
         // ฟังก์ชันอัพเดทข้อมูลบนหน้าเว็บ
         function updateQueueDisplay(data) {
             if (!data) return;
@@ -464,7 +479,7 @@
             
             // อัพเดทข้อมูล
             document.getElementById('currentQueue').textContent = data.currentQueue;
-            document.getElementById('nextQueue').textContent = data.nextQueue;
+            document.getElementById('nextQueue').textContent = formatQueue(data.nextQueue);
             document.getElementById('waitingQueue').textContent = data.waitingQueue;
             document.getElementById('lastUpdate').textContent = data.lastUpdate;
             

@@ -595,6 +595,7 @@
                         
                         // แสดงการแจ้งเตือน
                         showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
+                        playNotificationSound();
                         
                     } catch (e) {
                         console.error('ไม่สามารถเปิดเสียงได้:', e);
@@ -608,6 +609,7 @@
                     //audioStatus.textContent = 'เสียงเปิดอยู่';
                     //audioStatus.style.color = '#48bb78';
                     showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
+                    playNotificationSound();
                 }
             } else {
                 // ปิดเสียง

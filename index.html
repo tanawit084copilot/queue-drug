@@ -351,6 +351,86 @@
             background: #3182ce;
         }
 
+        /* Toggle Switch Styles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: #48bb78;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider:hover {
+            box-shadow: 0 0 8px rgba(72, 187, 120, 0.4);
+        }
+
+        /* Icon styles */
+        .toggle-icon {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .toggle-status {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 5px;
+        }
+
 
         
     </style>
@@ -390,16 +470,31 @@
                 </div>                
             </div>
         </div>
-
-        <div class="demo-controls">
+         
+        <!--<div class="demo-controls">
             <button class="demo-btn" id="toggleAudioBtn" onclick="toggleAudio()">🔇 เปิดเสียง</button>
             <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
         </div>
 
-<!--         <div class="demo-controls">
+       <div class="demo-controls">
             <button class="demo-btn" id="enableAudioBtn" onclick="enableAudio()">🔊 เปิดเสียง</button>
             <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
         </div> -->
+
+        <div class="demo-controls">
+            <div class="toggle-container">
+                <div class="toggle-icon">
+                    <span id="soundIcon">🔇</span>
+                    <span class="toggle-label">เสียงแจ้งเตือน</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="audioToggle" onchange="toggleAudio()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-status" id="audioStatus">เสียงปิดอยู่</div>
+            <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
+        </div>
 
         <div class="refresh-info">
             📱 ข้อมูลจะอัพเดทอัตโนมัติทุก 30 วินาที<br>
@@ -441,10 +536,51 @@
         // }
 
         // ฟังก์ชันเปิด/ปิดเสียง (Toggle)
-        function toggleAudio() {
-            const toggleBtn = document.getElementById('toggleAudioBtn');
+        // function toggleAudio() {
+        //     const toggleBtn = document.getElementById('toggleAudioBtn');
             
-            if (!isAudioEnabled) {
+        //     if (!isAudioEnabled) {
+        //         // เปิดเสียง
+        //         if (!audioContext) {
+        //             try {
+        //                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        //                 isAudioEnabled = true;
+        //                 console.log('🔊 เปิดเสียงแล้ว');
+                        
+        //                 // เปลี่ยนปุ่มเป็น "ปิดเสียง"
+        //                 toggleBtn.innerHTML = '🔊 ปิดเสียง';
+        //                 toggleBtn.style.background = '#e53e3e'; // สีแดง
+                        
+        //                 // แสดงการแจ้งเตือน
+        //                 showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
+                        
+        //             } catch (e) {
+        //                 console.error('ไม่สามารถเปิดเสียงได้:', e);
+        //                 showNotification('❌ ไม่สามารถเปิดเสียงได้');
+        //             }
+        //         }
+        //     } else {
+        //         // ปิดเสียง
+        //         isAudioEnabled = false;
+        //         audioContext = null;
+        //         console.log('🔇 ปิดเสียงแล้ว');
+                
+        //         // เปลี่ยนปุ่มเป็น "เปิดเสียง"
+        //         toggleBtn.innerHTML = '🔇 เปิดเสียง';
+        //         toggleBtn.style.background = '#4299e1'; // สีน้ำเงิน
+                
+        //         // แสดงการแจ้งเตือน
+        //         showNotification('🔇 ปิดเสียงแจ้งเตือนแล้ว');
+        //     }
+        // }
+
+        // ฟังก์ชันเปิด/ปิดเสียง (Toggle Switch)
+        function toggleAudio() {
+            const audioToggle = document.getElementById('audioToggle');
+            const soundIcon = document.getElementById('soundIcon');
+            const audioStatus = document.getElementById('audioStatus');
+            
+            if (audioToggle.checked) {
                 // เปิดเสียง
                 if (!audioContext) {
                     try {
@@ -452,9 +588,10 @@
                         isAudioEnabled = true;
                         console.log('🔊 เปิดเสียงแล้ว');
                         
-                        // เปลี่ยนปุ่มเป็น "ปิดเสียง"
-                        toggleBtn.innerHTML = '🔊 ปิดเสียง';
-                        toggleBtn.style.background = '#e53e3e'; // สีแดง
+                        // เปลี่ยน UI
+                        soundIcon.textContent = '🔊';
+                        audioStatus.textContent = 'เสียงเปิดอยู่';
+                        audioStatus.style.color = '#48bb78';
                         
                         // แสดงการแจ้งเตือน
                         showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
@@ -462,17 +599,25 @@
                     } catch (e) {
                         console.error('ไม่สามารถเปิดเสียงได้:', e);
                         showNotification('❌ ไม่สามารถเปิดเสียงได้');
+                        // Reset switch if failed
+                        audioToggle.checked = false;
                     }
+                } else {
+                    isAudioEnabled = true;
+                    soundIcon.textContent = '🔊';
+                    audioStatus.textContent = 'เสียงเปิดอยู่';
+                    audioStatus.style.color = '#48bb78';
+                    showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
                 }
             } else {
                 // ปิดเสียง
                 isAudioEnabled = false;
-                audioContext = null;
                 console.log('🔇 ปิดเสียงแล้ว');
                 
-                // เปลี่ยนปุ่มเป็น "เปิดเสียง"
-                toggleBtn.innerHTML = '🔇 เปิดเสียง';
-                toggleBtn.style.background = '#4299e1'; // สีน้ำเงิน
+                // เปลี่ยน UI
+                soundIcon.textContent = '🔇';
+                audioStatus.textContent = 'เสียงปิดอยู่';
+                audioStatus.style.color = '#718096';
                 
                 // แสดงการแจ้งเตือน
                 showNotification('🔇 ปิดเสียงแจ้งเตือนแล้ว');

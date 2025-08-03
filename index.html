@@ -492,8 +492,8 @@
                     <span class="slider"></span>
                 </label>
             </div>
-            <div class="toggle-status" id="audioStatus">เสียงปิดอยู่</div>
-            <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button>
+           <!--<div class="toggle-status" id="audioStatus">เสียงปิดอยู่</div>
+            <button class="demo-btn" onclick="testAnimation()">✨ ทดสอบเสียงเอฟเฟกต์</button> -->
         </div>
 
         <div class="refresh-info">
@@ -578,7 +578,7 @@
         function toggleAudio() {
             const audioToggle = document.getElementById('audioToggle');
             const soundIcon = document.getElementById('soundIcon');
-            const audioStatus = document.getElementById('audioStatus');
+            //const audioStatus = document.getElementById('audioStatus');
             
             if (audioToggle.checked) {
                 // เปิดเสียง
@@ -590,8 +590,8 @@
                         
                         // เปลี่ยน UI
                         soundIcon.textContent = '🔊';
-                        audioStatus.textContent = 'เสียงเปิดอยู่';
-                        audioStatus.style.color = '#48bb78';
+                        //audioStatus.textContent = 'เสียงเปิดอยู่';
+                        //audioStatus.style.color = '#48bb78';
                         
                         // แสดงการแจ้งเตือน
                         showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
@@ -605,8 +605,8 @@
                 } else {
                     isAudioEnabled = true;
                     soundIcon.textContent = '🔊';
-                    audioStatus.textContent = 'เสียงเปิดอยู่';
-                    audioStatus.style.color = '#48bb78';
+                    //audioStatus.textContent = 'เสียงเปิดอยู่';
+                    //audioStatus.style.color = '#48bb78';
                     showNotification('✅ เปิดเสียงแจ้งเตือนแล้ว');
                 }
             } else {
@@ -616,8 +616,8 @@
                 
                 // เปลี่ยน UI
                 soundIcon.textContent = '🔇';
-                audioStatus.textContent = 'เสียงปิดอยู่';
-                audioStatus.style.color = '#718096';
+                //audioStatus.textContent = 'เสียงปิดอยู่';
+                //audioStatus.style.color = '#718096';
                 
                 // แสดงการแจ้งเตือน
                 showNotification('🔇 ปิดเสียงแจ้งเตือนแล้ว');
